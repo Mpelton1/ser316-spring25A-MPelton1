@@ -107,19 +107,18 @@ public class Game
      * Constructs a new game with a random word.
      * @param name
      */
-    public Game(String name){
+    public Game(String name) {
         this.name = name;
         setRandomWord();
         setPoints(5);
-
     }
 
     /**
      * Constructs a new game with a given word and given name.
      * @param name
      */
-    public Game(String fixedWord, String name){
-        this.name = "Anna";
+    public Game(String fixedWord, String name) {
+        this.name = name; // Corrected to use the provided name
         this.answer = fixedWord;
         setPoints(10);
     }
@@ -127,7 +126,8 @@ public class Game
     /**
      * Constructs a new game with no arguments, empty name and answer
      */
-    public Game(){
+
+    public Game() {
         this.name = "";
         this.answer = "";
         setPoints(10);
@@ -136,7 +136,7 @@ public class Game
     /**
      * Sets the name and answers of an already existing game and clears the guesses
      */
-    public void initGame(String answer, String name){
+    public void initGame(String answer, String name) {
         this.name = name;
         this.answer = answer;
         this.gameStatus = 0;
@@ -144,6 +144,7 @@ public class Game
         this.answers.clear();
         setPoints(10);
     }
+
 
     /**
      * Checks if the guess made is correct, should ignore upper/lower case. Should give points based on made guess.
@@ -184,13 +185,82 @@ public class Game
      * @return double returns the appropriate number
      */
     public double makeGuess(String guess) {
-        System.out.println("Implement me in assignment 3");
-        return 0.0;
+        // Case 1: If the game is already won or over
+        if (gameStatus == 1 || gameStatus == 2) {
+            return 5.1; // Game over or won, don't allow further guesses
+        }
+
+        // Case 2: Guess already used
+        if (guesses.contains(guess)) {
+            points -= 2;
+            return 4.0; // Guess already used
+        }
+
+        // Case 3: Guess contains non-alphabetic characters
+        if (!guess.matches("[a-zA-Z]+")) {
+            points -= 3;
+            return 4.1; // Invalid characters in guess
+        }
+
+        // Case 4: Single letter guess
+        if (guess.length() == 1) {
+            guesses.add(guess);
+            int letterCount = countLetters(guess.charAt(0));
+            if (letterCount == 0) {
+                return 1.0; // Letter not in word
+            } else {
+                points += letterCount;
+                return 1.0 + letterCount; // Letter in word, return occurrences
+            }
+        }
+
+        // Case 5: Word guess
+        if (guess.length() == answer.length()) {
+            if (guess.equalsIgnoreCase(answer)) {
+                gameStatus = 1; // Game won
+                points += answer.length(); // Add points for full word
+                return 0.0; // Correct word
+            } else {
+                guesses.add(guess);
+                if (isPartialWordMatch(guess)) {
+                    points += 2; // Partial match, add 2 points
+                    return 3.0; // Partially correct
+                } else {
+                    points -= Math.abs(guess.length() - answer.length());
+                    if (guess.length() > answer.length()) {
+                        return 2.1; // Too long word
+                    } else {
+                        return 2.2; // Too short word
+                    }
+                }
+            }
+        }
+
+        // Case 6: Guess limit reached
+        guesses.add(guess);
+        points -= 1;
+        if (guesses.size() >= 10) {
+            gameStatus = 2; // Game over
+            return 5.0; // Game over
+        }
+
+        return -1; // Unhandled case
     }
 
-    /**
-     * Pulls out a random animal and sets it as answer
-     */
+    private boolean isPartialWordMatch(String guess) {
+        for (int i = 0; i < guess.length(); i++) {
+            if (answer.contains(String.valueOf(guess.charAt(i)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+        /**
+         * Pulls out a random animal and sets it as answer
+         */
     public void setRandomWord()
     {
 
