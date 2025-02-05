@@ -119,7 +119,7 @@ public class Game
      * @param name
      */
     public Game(String fixedWord, String name){
-        this.name = "Anna";
+        this.name = name;
         this.answer = fixedWord;
         setPoints(10);
     }
@@ -184,8 +184,47 @@ public class Game
      * @return double returns the appropriate number
      */
     public double makeGuess(String guess) {
-        System.out.println("Implement me in assignment 3");
-        return 0.0;
+        if (gameStatus != 0) {
+            return 5.1; 
+        }
+        if (guess.length() == 1) {
+            if (guesses.contains(guess)) {
+                points -= 2;
+                return 4.0;
+            }
+            guesses.add(guess);
+            int count = countLetters(guess.charAt(0));
+            if (count > 0) {
+                points += count;
+                return 1.0 + count;
+            } else {
+                points--;
+                return 1.0;
+            }
+        } else if (guess.length() == answer.length()) {
+            if (guess.equalsIgnoreCase(answer)) {
+                gameStatus = 1;
+                points += answer.length();
+                return 0.0;
+            } else {
+                points += 1;
+                return 2.0;
+            }
+        } else if (guess.length() > answer.length()) {
+
+            points -= (guess.length() - answer.length());
+            return 2.1;
+        } else if (guess.length() < answer.length()) {
+            points -= (answer.length() - guess.length());
+            return 2.2;
+        } else {
+            return 4.1;
+        }
+        if (guesses.size() >= 10) {
+            gameStatus = 2;
+            return 5.0;
+        }
+        return -1.0;
     }
 
     /**
