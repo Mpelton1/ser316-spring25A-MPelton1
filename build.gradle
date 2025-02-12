@@ -1,8 +1,8 @@
 // plugins {
-//     id "com.github.spotbugs" version "5.0.13"
-//     id "checkstyle"
+//      id "com.github.spotbugs" version "5.0.13"
+//      id "checkstyle"
 // }
-
+apply plugin: 'jacoco'
 apply plugin: 'application'
 
 repositories {
@@ -23,18 +23,38 @@ test {
     useJUnitPlatform()
 }
 
-// apply plugin: 'checkstyle'
-// checkstyle {
-//     // Keep checkstyle a little quieter
-//     ignoreFailures = true
-//     showViolations = false
-// }
+test {
+    exclude '**/BlackBoxGiven.class'
+}
 
-// tasks.withType(Checkstyle) {
-// }
-// checkstyle {
-//     toolVersion = "8.8"
-// }
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+}
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+ apply plugin: 'checkstyle'
+  checkstyle {
+    // Keep checkstyle a little quieter
+    ignoreFailures = true
+    showViolations = false
+  }
+
+  tasks.withType(Checkstyle) {
+  }
+  checkstyle {
+      toolVersion = "8.8"
+  }
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -55,5 +75,6 @@ test {
 //         xml.required.set(false)
 //     }
 // }
+
 
 
