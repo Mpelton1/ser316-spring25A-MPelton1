@@ -1,80 +1,74 @@
 // plugins {
-//      id "com.github.spotbugs" version "5.0.13"
-//      id "checkstyle"
+//   id "com.github.spotbugs" version "1.6.11"
 // }
-apply plugin: 'jacoco'
-apply plugin: 'application'
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
+
+plugins {
+    id 'pmd'
 }
 
+
+
+apply plugin: 'application'
+apply plugin: 'jacoco'
+
+
+mainClassName = 'main.java.Main'
+
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    mavenCentral()
+}
+
+// In this section you declare the dependencies for your production and test code
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
+    implementation "junit:junit:4.12"
     implementation files('cls/')
 }
 
-mainClassName = 'Main'
-
-test {
-    useJUnitPlatform()
-}
-
-test {
-    exclude '**/BlackBoxGiven.class'
-}
-
-
-jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
-}
-jacoco {
-    toolVersion = "0.8.8"
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
-}
-jacocoTestReport {
-    reports {
-        xml.required = false
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
-    }
-}
-
- apply plugin: 'checkstyle'
-  checkstyle {
-    // Keep checkstyle a little quieter
+apply plugin: "pmd"
+pmd {
     ignoreFailures = true
-    showViolations = false
-  }
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSets = []
+    ruleSetConfig = resources.text.fromFile('ruleset.xml')
+}
 
-  tasks.withType(Checkstyle) {
-  }
-  checkstyle {
-      toolVersion = "8.8"
-  }
+/////////////////////////////////////////////////////////////////////////
+// Configure Checkstyle
+/////////////////////////////////////////////////////////////////////////
+// apply plugin: 'checkstyle'
+// checkstyle {
+//   // Keep checkstyle a little quieter
+//   ignoreFailures = true
+//   showViolations = false
+// }
+
+// tasks.withType(Checkstyle) {
+//   reports {
+//     html.enabled = true
+//     xml.enabled = false
+//   }
+// }
+// checkstyle {
+//     toolVersion = "8.8"
+// }
 
 
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 // Configure SpotBugs
-///////////////////////////////////////////////////////////////////////
-// To generate an HTML report instead of XML
+///////////////////////////////////////////////////////////////////////////
+
 // spotbugs {
-//     toolVersion = '4.8.4'
-//     ignoreFailures = true
-//     showProgress = true
-//     effort = 'max'
-//     reportLevel = 'low'
+//   toolVersion = '3.1.12'
 // }
 
-// tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
-//     reports {
-//         html.required.set(true)
-//         xml.required.set(false)
-//     }
+// // To generate an HTML report instead of XML
+// tasks.withType(com.github.spotbugs.SpotBugsTask) {
+//   reports {
+//     xml.enabled = false
+//     html.enabled = true
+//   }
 // }
-
-
-
